@@ -404,19 +404,15 @@
         }
 
         function sendResultsToSheet(payload) {
-            alert('جاري إرسال النتيجة الآن...');
             if (SCRIPT_URL.indexOf('PASTE_') !== -1) {
-                alert('خطأ: رابط Google Apps Script غير مربوط.');
+                console.warn('لم يتم ربط رابط Google Apps Script بعد.');
                 return;
             }
             fetch(SCRIPT_URL, {
                 method: 'POST',
                 headers: { 'Content-Type': 'text/plain;charset=utf-8' },
                 body: JSON.stringify(payload)
-            })
-            .then(res => res.text())
-            .then(text => alert('رد السيرفر: ' + text))
-            .catch(err => alert('تعذر إرسال النتائج - الخطأ: ' + err));
+            }).catch(err => console.error('تعذر إرسال النتائج:', err));
         }
 
         const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
