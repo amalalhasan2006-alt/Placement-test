@@ -404,8 +404,9 @@
         }
 
         function sendResultsToSheet(payload) {
+            alert('جاري إرسال النتيجة الآن...');
             if (SCRIPT_URL.indexOf('PASTE_') !== -1) {
-                console.warn('لم يتم ربط رابط Google Apps Script بعد.');
+                alert('خطأ: رابط Google Apps Script غير مربوط.');
                 return;
             }
             fetch(SCRIPT_URL, {
@@ -414,8 +415,8 @@
                 body: JSON.stringify(payload)
             })
             .then(res => res.text())
-            .then(text => console.log('رد السيرفر:', text))
-            .catch(err => console.error('تعذر إرسال النتائج:', err));
+            .then(text => alert('رد السيرفر: ' + text))
+            .catch(err => alert('تعذر إرسال النتائج - الخطأ: ' + err));
         }
 
         const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
