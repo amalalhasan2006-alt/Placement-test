@@ -297,21 +297,21 @@
                 <div class="level-card" onclick="startLevel(0)">
                     <div class="level-info">
                         <h3>المستوى الأول (A1 - A2)</h3>
-                        <p>10 أسئلة أساسية - مفردات وقواعد عامة</p>
+                        <p>26 سؤال متنوع - اختيار، إكمال، ترجمة، تصحيح، استماع</p>
                     </div>
                     <div class="level-status" id="status-0">متاح</div>
                 </div>
                 <div class="level-card" id="card-1" onclick="startLevel(1)">
                     <div class="level-info">
                         <h3>المستوى الثاني (B1)</h3>
-                        <p>10 أسئلة متوسطة - قواعد وتراكيب متقدمة</p>
+                        <p>26 سؤال متنوع - اختيار، إكمال، ترجمة، تصحيح، استماع</p>
                     </div>
                     <div class="level-status" id="status-1">متاح</div>
                 </div>
                 <div class="level-card" id="card-2" onclick="startLevel(2)">
                     <div class="level-info">
                         <h3>المستوى الثالث (B2)</h3>
-                        <p>10 أسئلة تفكير عالٍ - تصحيح أخطاء واحترافي</p>
+                        <p>26 سؤال متنوع - اختيار، إكمال، ترجمة، تصحيح، استماع</p>
                     </div>
                     <div class="level-status" id="status-2">متاح</div>
                 </div>
@@ -323,15 +323,17 @@
                 <span id="question-progress">السؤال 1 من 10</span>
                 <span id="score-display">النقاط: 0</span>
             </div>
+            <div id="audio-container"></div>
+            <div id="label-container"></div>
             <div class="question-box" id="question-text">نص السؤال هنا؟</div>
-            <div class="options-grid" id="options-container"></div>
+            <div id="answer-area"></div>
         </div>
 
         <div id="results-screen" class="screen">
             <div class="results-content">
                 <h2 id="result-title">انتهى المستوى!</h2>
                 <p id="result-message">لقد حصلت على 8 من 10</p>
-                <button class="btn" onclick="returnToHome()">العودة للمستويات</button>
+                <button class="btn" id="continue-btn" onclick="returnToHome()">العودة للمستويات</button>
             </div>
         </div>
     </div>
@@ -339,40 +341,94 @@
     <script>
         const levelsData = [
             [
-                { q: "Choose the correct verb: She _____ to work every day.", options: ["go", "goes", "going", "gone"], answer: 1 },
-                { q: "Complete the sentence: There _____ many books on the desk.", options: ["is", "are", "be", "am"], answer: 1 },
-                { q: "What is the opposite of 'Ancient'?", options: ["Old", "Modern", "Slow", "Bad"], answer: 1 },
-                { q: "Choose the correct pronoun: This is my car. Give the keys to _____.", options: ["he", "she", "me", "they"], answer: 2 },
-                { q: "Complete: I usually get up _____ 7:00 AM.", options: ["in", "on", "at", "to"], answer: 2 },
-                { q: "What does 'Hospital' mean?", options: ["A place to buy food", "A place to study", "A place to treat sick people", "A place to watch movies"], answer: 2 },
-                { q: "Choose the correct form: He can _____ English very well.", options: ["speaks", "speak", "speaking", "spoke"], answer: 1 },
-                { q: "Fill in the blank: My brother is older _____ me.", options: ["then", "than", "to", "as"], answer: 1 },
-                { q: "What is the past tense of 'Go'?", options: ["Goed", "Gone", "Went", "Going"], answer: 2 },
-                { q: "Complete: They _____ watching a movie right now.", options: ["is", "are", "am", "be"], answer: 1 }
+                { type: "mcq", q: "Choose the correct verb: She _____ to work every day.", options: ["go", "goes", "going", "gone"], answer: 1 },
+                { type: "mcq", q: "Complete the sentence: There _____ many books on the desk.", options: ["is", "are", "was", "were"], answer: 1 },
+                { type: "mcq", q: "What is the opposite of 'Ancient'?", options: ["Old", "Modern", "Traditional", "Historic"], answer: 1 },
+                { type: "mcq", q: "Choose the correct pronoun: This is my car. Give the keys to _____.", options: ["I", "him", "me", "us"], answer: 2 },
+                { type: "mcq", q: "Complete: I usually get up _____ 7:00 AM.", options: ["in", "on", "at", "to"], answer: 2 },
+                { type: "mcq", q: "What does 'Hospital' mean?", options: ["A place to buy food", "A place to study", "A place to treat sick people", "A place to watch movies"], answer: 2 },
+                { type: "mcq", q: "Choose the correct plural: One child, two _____.", options: ["childs", "children", "childes", "child"], answer: 1 },
+                { type: "mcq", q: "Choose the correct question word: _____ is your name?", options: ["Who", "What", "Where", "When"], answer: 1 },
+                { type: "mcq", q: "Choose the correct article: I saw _____ elephant at the zoo.", options: ["a", "an", "the", "(no article)"], answer: 1 },
+                { type: "mcq", q: "Choose the correct verb: They _____ football every weekend.", options: ["plays", "play", "playing", "played"], answer: 1 },
+
+                { type: "typing", label: "أكملي الجملة:", q: "My father ___ (work) in a bank.", answer: "works" },
+                { type: "typing", label: "أكملي الجملة:", q: "We ___ (not / like) spicy food.", answer: ["don't like", "do not like"] },
+                { type: "typing", label: "أكملي الجملة:", q: "Look! The children ___ (play) in the garden.", answer: "are playing" },
+                { type: "typing", label: "أكملي الجملة:", q: "She ___ (have) two brothers and one sister.", answer: "has" },
+                { type: "typing", label: "أكملي الجملة:", q: "Yesterday, I ___ (visit) my grandmother.", answer: "visited" },
+
+                { type: "typing", label: "ترجمي الجملة إلى الإنجليزية:", q: "أنا أحب القراءة.", answer: ["I like reading", "I love reading"] },
+                { type: "typing", label: "ترجمي الجملة إلى الإنجليزية:", q: "هذا كتابي.", answer: "This is my book" },
+                { type: "typing", label: "ترجمي الجملة إلى الإنجليزية:", q: "هي تذهب إلى المدرسة كل يوم.", answer: "She goes to school every day" },
+                { type: "typing", label: "ترجمي الجملة إلى الإنجليزية:", q: "نحن نعيش في مدينة كبيرة.", answer: "We live in a big city" },
+                { type: "typing", label: "ترجمي الجملة إلى الإنجليزية:", q: "هل تحب القهوة؟", answer: ["Do you like coffee", "Do you like coffee?"] },
+
+                { type: "typing", label: "صححي الفعل الذي تحته خط:", q: "She <u>go</u> to school every morning.", answer: "goes" },
+                { type: "typing", label: "صححي الفعل الذي تحته خط:", q: "He <u>are</u> a doctor.", answer: "is" },
+                { type: "typing", label: "صححي الفعل الذي تحته خط:", q: "They <u>doesn't</u> like vegetables.", answer: "don't" },
+                { type: "typing", label: "صححي الفعل الذي تحته خط:", q: "I <u>is</u> from Syria.", answer: "am" },
+                { type: "typing", label: "صححي الفعل الذي تحته خط:", q: "We <u>goed</u> to the market yesterday.", answer: "went" }
             ],
             [
-                { q: "Choose the correct sentence: 'If I ___ him, I will tell him.'", options: ["will see", "see", "saw", "seeing"], answer: 1 },
-                { q: "Choose the correct passive form: 'They built this house in 1995.'", options: ["This house is built in 1995.", "This house was built in 1995.", "This house has built in 1995.", "This house builds in 1995."], answer: 1 },
-                { q: "Fill in the blank with the correct preposition: She is interested _____ learning French.", options: ["on", "at", "in", "with"], answer: 2 },
-                { q: "Choose the correct modal verb for obligation: You _____ submit the report before Friday.", options: ["might", "must", "can", "could"], answer: 1 },
-                { q: "What is a synonym for 'Crucial'?", options: ["Unimportant", "Vague", "Essential", "Minor"], answer: 2 },
-                { q: "Complete the sentence: I wish I _____ a bigger car.", options: ["have", "had", "will have", "has"], answer: 1 },
-                { q: "Identify the correct reported speech: He said, 'I am tired.'", options: ["He said that he is tired.", "He said that he was tired.", "He said that I am tired.", "He told me he has tired."], answer: 1 },
-                { q: "Fill in the blank: Neither John _____ Mary came to the meeting.", options: ["or", "nor", "and", "but"], answer: 1 },
-                { q: "Choose the correct relative pronoun: The man _____ car was stolen called the police.", options: ["who", "which", "whose", "whom"], answer: 2 },
-                { q: "Complete with the correct tense: By the time we arrived, the train _____.", options: ["left", "had left", "has left", "leaves"], answer: 1 }
+                { type: "mcq", q: "Choose the correct sentence: 'If I ___ him, I will tell him.'", options: ["will see", "see", "saw", "seeing"], answer: 1 },
+                { type: "mcq", q: "Choose the correct passive form: 'They built this house in 1995.'", options: ["This house is built in 1995.", "This house was built in 1995.", "This house has built in 1995.", "This house builds in 1995."], answer: 1 },
+                { type: "mcq", q: "Fill in the blank with the correct preposition: She is interested _____ learning French.", options: ["on", "at", "in", "with"], answer: 2 },
+                { type: "mcq", q: "Choose the correct modal verb for obligation: You _____ submit the report before Friday.", options: ["might", "must", "should", "could"], answer: 1 },
+                { type: "mcq", q: "What is a synonym for 'Crucial'?", options: ["Unimportant", "Vague", "Essential", "Minor"], answer: 2 },
+                { type: "mcq", q: "Complete the sentence: I wish I _____ a bigger car.", options: ["have", "had", "will have", "has"], answer: 1 },
+                { type: "mcq", q: "Choose the correct comparative: This book is _____ than that one.", options: ["more interesting", "interestinger", "most interesting", "more interested"], answer: 0 },
+                { type: "mcq", q: "Choose the correct question tag: You live here, _____?", options: ["do you", "don't you", "aren't you", "isn't it"], answer: 1 },
+                { type: "mcq", q: "Choose the correct preposition: I have lived here _____ five years.", options: ["since", "for", "from", "at"], answer: 1 },
+                { type: "mcq", q: "Choose the correct sentence: When I was young, I _____ play football every day.", options: ["use to", "used to", "uses to", "using to"], answer: 1 },
+
+                { type: "typing", label: "أكملي الجملة:", q: "If it ___ (rain) tomorrow, we will stay home.", answer: "rains" },
+                { type: "typing", label: "أكملي الجملة:", q: "She has ___ (live) here since 2015.", answer: "lived" },
+                { type: "typing", label: "أكملي الجملة:", q: "By next year, I ___ (graduate) from university.", answer: "will graduate" },
+                { type: "typing", label: "أكملي الجملة:", q: "This report ___ (write) by the manager last week.", answer: "was written" },
+                { type: "typing", label: "أكملي الجملة:", q: "I ___ (not / finish) my project yet.", answer: ["haven't finished", "have not finished"] },
+
+                { type: "typing", label: "ترجمي الجملة إلى الإنجليزية:", q: "لقد عشت في هذه المدينة منذ خمس سنوات.", answer: "I have lived in this city for five years" },
+                { type: "typing", label: "ترجمي الجملة إلى الإنجليزية:", q: "لو كان عندي وقت، كنت سأزورك.", answer: "If I had time, I would visit you" },
+                { type: "typing", label: "ترجمي الجملة إلى الإنجليزية:", q: "يجب أن تنهي واجبك قبل الساعة العاشرة.", answer: "You must finish your homework before ten o'clock" },
+                { type: "typing", label: "ترجمي الجملة إلى الإنجليزية:", q: "هذا المنزل بُني في عام 1990.", answer: "This house was built in 1990" },
+                { type: "typing", label: "ترجمي الجملة إلى الإنجليزية:", q: "أتمنى لو كانت لدي سيارة أكبر.", answer: "I wish I had a bigger car" },
+
+                { type: "typing", label: "صححي الفعل الذي تحته خط:", q: "She <u>has went</u> to the market.", answer: ["has gone", "went"] },
+                { type: "typing", label: "صححي الفعل الذي تحته خط:", q: "If I <u>will see</u> him, I will tell him.", answer: "see" },
+                { type: "typing", label: "صححي الفعل الذي تحته خط:", q: "This house <u>build</u> in 1995.", answer: "was built" },
+                { type: "typing", label: "صححي الفعل الذي تحته خط:", q: "They <u>has</u> finished the project.", answer: "have" },
+                { type: "typing", label: "صححي الفعل الذي تحته خط:", q: "By the time we arrived, the train <u>leave</u>.", answer: "had left" }
             ],
             [
-                { q: "Choose the best advanced connector: _____ the weather was terrible, we enjoyed our trip.", options: ["Despite", "Although", "In spite of", "However"], answer: 1 },
-                { q: "Choose the correct reported question: He asked, 'Where do you live?'", options: ["He asked where I lived.", "He asked where did I live.", "He asked where I live.", "He asked where do I live."], answer: 0 },
-                { q: "What does the idiom 'break the ice' mean?", options: ["To destroy something frozen", "To make people feel more relaxed", "To create a problem", "To start a fight"], answer: 1 },
-                { q: "Choose the correct collocation: The company managed to _____ a high profit this year.", options: ["do", "make", "get", "take"], answer: 1 },
-                { q: "Choose the correct sentence:", options: ["Despite the rain, we went out.", "Despite of the rain, we went out.", "Despite it rained, we went out.", "Despite the rain was heavy, we went out."], answer: 0 },
-                { q: "Choose the correct word to complete the definition: A _____ is a person who is exceptionally intelligent or creative.", options: ["novice", "prodigy", "slacker", "miser"], answer: 1 },
-                { q: "Select the correct conditional structure for an unreal past situation:", options: ["If I knew, I would help you.", "If I had known, I would have helped you.", "If I know, I will help you.", "If I would have known, I had helped you."], answer: 1 },
-                { q: "Choose the correct sentence:", options: ["It was such a difficult exam that many students failed.", "It was so difficult exam that many students failed.", "It was such difficult exam that many students failed.", "It was so a difficult exam that many students failed."], answer: 0 },
-                { q: "What is the meaning of the phrasal verb 'to put off'?", options: ["To extinguish", "To postpone", "To tolerate", "To reject"], answer: 1 },
-                { q: "Choose the correct sentence:", options: ["It's time we left.", "It's time we leave.", "It's time we will leave.", "It's time we are leaving."], answer: 0 }
+                { type: "mcq", q: "Choose the best advanced connector: _____ the weather was terrible, we enjoyed our trip.", options: ["Despite", "Although", "In spite of", "However"], answer: 1 },
+                { type: "mcq", q: "Choose the correct reported question: He asked, 'Where do you live?'", options: ["He asked where I lived.", "He asked where did I live.", "He asked where I live.", "He asked where do I live."], answer: 0 },
+                { type: "mcq", q: "What does the idiom 'break the ice' mean?", options: ["To calm someone down", "To make people feel more relaxed", "To create a problem", "To end a conversation"], answer: 1 },
+                { type: "mcq", q: "Choose the correct collocation: The company managed to _____ a high profit this year.", options: ["do", "make", "get", "take"], answer: 1 },
+                { type: "mcq", q: "Choose the correct sentence:", options: ["Despite the rain, we went out.", "Despite of the rain, we went out.", "Despite it rained, we went out.", "Despite the rain was heavy, we went out."], answer: 0 },
+                { type: "mcq", q: "Choose the correct word to complete the definition: A _____ is a person who is exceptionally intelligent or creative.", options: ["novice", "prodigy", "slacker", "miser"], answer: 1 },
+                { type: "mcq", q: "Choose the correct form: I'd rather you _____ smoke here.", options: ["don't", "didn't", "won't", "not"], answer: 1 },
+                { type: "mcq", q: "Choose the correct collocation: After a long discussion, they finally _____ a conclusion.", options: ["made", "did", "came to", "took"], answer: 2 },
+                { type: "mcq", q: "Choose the correct linking word: The traffic was terrible; _____, we arrived on time.", options: ["therefore", "moreover", "nevertheless", "furthermore"], answer: 2 },
+                { type: "mcq", q: "Choose the correct passive form: The report _____ by tomorrow.", options: ["must finish", "must be finished", "must finishing", "must be finish"], answer: 1 },
+
+                { type: "typing", label: "أكملي الجملة:", q: "I regret not ___ (study) harder at school.", answer: "studying" },
+                { type: "typing", label: "أكملي الجملة:", q: "The bridge ___ (build) by next year.", answer: "will be built" },
+                { type: "typing", label: "أكملي الجملة:", q: "If she ___ (study) harder, she would have passed the exam.", answer: "had studied" },
+                { type: "typing", label: "أكملي الجملة:", q: "The company's profits have ___ (increase) significantly this year.", answer: "increased" },
+                { type: "typing", label: "أكملي الجملة:", q: "She apologized for ___ (be) late.", answer: "being" },
+
+                { type: "typing", label: "ترجمي الجملة إلى الإنجليزية:", q: "لو كنت أعرف، لكنت ساعدتك.", answer: "If I had known, I would have helped you" },
+                { type: "typing", label: "ترجمي الجملة إلى الإنجليزية:", q: "على الرغم من المطر، خرجنا في نزهة.", answer: "Despite the rain, we went out for a walk" },
+                { type: "typing", label: "ترجمي الجملة إلى الإنجليزية:", q: "الاجتماع أُجّل إلى الأسبوع القادم.", answer: "The meeting was postponed until next week" },
+                { type: "typing", label: "ترجمي الجملة إلى الإنجليزية:", q: "يجب تسليم التقرير بحلول يوم الجمعة.", answer: "The report must be submitted by Friday" },
+                { type: "typing", label: "ترجمي الجملة إلى الإنجليزية:", q: "كان الامتحان صعبًا لدرجة أن كثيرًا من الطلاب رسبوا.", answer: "The exam was so difficult that many students failed" },
+
+                { type: "typing", label: "صححي الفعل الذي تحته خط:", q: "He <u>has finished</u> the report yesterday.", answer: "finished" },
+                { type: "typing", label: "صححي الفعل الذي تحته خط:", q: "The company <u>make</u> a huge profit last year.", answer: "made" },
+                { type: "typing", label: "صححي الفعل الذي تحته خط:", q: "If I <u>would know</u> the answer, I would tell you.", answer: "knew" },
+                { type: "typing", label: "صححي الفعل الذي تحته خط:", q: "The letter <u>send</u> by the manager this morning.", answer: "was sent" },
+                { type: "typing", label: "صححي الفعل الذي تحته خط:", q: "By the time she called, I <u>leave</u> already.", answer: "had left" }
             ]
         ];
 
@@ -460,20 +516,57 @@
             loadQuestion();
         }
 
+        let currentOrderSelection = [];
+
         function loadQuestion() {
             const qData = levelsData[currentLevel][currentQuestionIndex];
-            document.getElementById('question-progress').innerText = `السؤال ${currentQuestionIndex + 1} من 10`;
+            const total = levelsData[currentLevel].length;
+            document.getElementById('question-progress').innerText = `السؤال ${currentQuestionIndex + 1} من ${total}`;
             document.getElementById('score-display').innerText = `النقاط: ${score}`;
-            document.getElementById('question-text').innerText = qData.q;
+            document.getElementById('question-text').innerHTML = qData.q;
 
+            const audioContainer = document.getElementById('audio-container');
+            audioContainer.innerHTML = qData.audio
+                ? `<audio controls src="${qData.audio}" style="width:100%;margin-bottom:20px;">متصفحك لا يدعم تشغيل الصوت</audio>`
+                : '';
+
+            const labelContainer = document.getElementById('label-container');
+            labelContainer.innerHTML = qData.label
+                ? `<span style="display:inline-block;background:var(--teal-accent);color:#fff;padding:4px 12px;border-radius:20px;font-size:0.8rem;font-weight:600;margin-bottom:12px;">${qData.label}</span>`
+                : '';
+
+            const type = qData.type || 'mcq';
+            if (type === 'mcq' || type === 'listening') {
+                renderMcqUI(qData);
+            } else if (type === 'typing') {
+                renderTypingUI(qData);
+            } else if (type === 'ordering') {
+                renderOrderingUI(qData);
+            }
+        }
+
+        function shuffleArray(arr) {
+            const a = arr.slice();
+            for (let i = a.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [a[i], a[j]] = [a[j], a[i]];
+            }
+            return a;
+        }
+
+        function renderMcqUI(qData) {
+            const area = document.getElementById('answer-area');
+            area.innerHTML = '<div class="options-grid" id="options-container"></div>';
             const optionsContainer = document.getElementById('options-container');
-            optionsContainer.innerHTML = '';
 
-            qData.options.forEach((opt, index) => {
+            const shuffledIndices = shuffleArray(qData.options.map((_, i) => i));
+
+            shuffledIndices.forEach(origIndex => {
                 const btn = document.createElement('button');
                 btn.className = 'option-btn';
-                btn.innerText = opt;
-                btn.onclick = () => selectAnswer(index, btn);
+                btn.innerText = qData.options[origIndex];
+                btn.dataset.origIndex = origIndex;
+                btn.onclick = () => selectAnswer(origIndex, btn);
                 optionsContainer.appendChild(btn);
             });
         }
@@ -481,7 +574,7 @@
         function selectAnswer(selectedIndex, selectedBtn) {
             const qData = levelsData[currentLevel][currentQuestionIndex];
             const allBtns = document.querySelectorAll('.option-btn');
-            
+
             allBtns.forEach(btn => btn.disabled = true);
 
             currentAnswersLog.push({
@@ -497,13 +590,147 @@
                 playSound('correct');
             } else {
                 selectedBtn.classList.add('incorrect');
-                allBtns[qData.answer].classList.add('correct');
+                const correctBtn = document.querySelector(`.option-btn[data-orig-index="${qData.answer}"]`);
+                if (correctBtn) correctBtn.classList.add('correct');
                 playSound('incorrect');
             }
 
+            advanceQuestion();
+        }
+
+        function renderTypingUI(qData) {
+            const area = document.getElementById('answer-area');
+            area.innerHTML = `
+                <div class="form-group">
+                    <input type="text" id="typing-input" placeholder="اكتبي إجابتك هنا">
+                </div>
+                <button class="btn" id="typing-submit" style="width:100%;">تأكيد الإجابة</button>
+            `;
+            const input = document.getElementById('typing-input');
+            document.getElementById('typing-submit').addEventListener('click', () => submitTyping(qData));
+            input.addEventListener('keypress', e => {
+                if (e.key === 'Enter') submitTyping(qData);
+            });
+            input.focus();
+        }
+
+        function normalizeAnswer(str) {
+            return str.trim().toLowerCase().replace(/[.,!?;:'"]/g, '').replace(/\s+/g, ' ');
+        }
+
+        function submitTyping(qData) {
+            const input = document.getElementById('typing-input');
+            const submitBtn = document.getElementById('typing-submit');
+            if (input.disabled) return;
+
+            const acceptedAnswers = Array.isArray(qData.answer) ? qData.answer : [qData.answer];
+            const userValue = input.value.trim();
+            const isCorrect = acceptedAnswers.some(a => normalizeAnswer(a) === normalizeAnswer(userValue));
+            const displayAnswer = acceptedAnswers[0];
+
+            input.disabled = true;
+            submitBtn.disabled = true;
+            input.style.borderColor = isCorrect ? 'var(--success)' : 'var(--error)';
+
+            if (!isCorrect) {
+                const hint = document.createElement('p');
+                hint.style.cssText = 'color:var(--error);margin-top:10px;font-weight:600;';
+                hint.innerText = 'الإجابة الصحيحة: ' + displayAnswer;
+                document.getElementById('answer-area').appendChild(hint);
+            }
+
+            if (isCorrect) { score++; playSound('correct'); } else { playSound('incorrect'); }
+
+            currentAnswersLog.push({
+                question: levelsData[currentLevel][currentQuestionIndex].q,
+                selected: userValue || '(فارغ)',
+                correct: displayAnswer,
+                isCorrect: isCorrect
+            });
+
+            advanceQuestion();
+        }
+
+        function renderOrderingUI(qData) {
+            currentOrderSelection = [];
+            const area = document.getElementById('answer-area');
+            area.innerHTML = `
+                <div id="order-slot" style="min-height:50px;border:2px dashed #cbd5e1;border-radius:10px;padding:12px;margin-bottom:15px;display:flex;flex-wrap:wrap;gap:8px;"></div>
+                <div id="order-pool" style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:15px;"></div>
+                <div style="display:flex; gap:10px;">
+                    <button class="btn" id="order-submit" disabled>تأكيد الترتيب</button>
+                    <button class="btn" id="order-clear" style="background:#94a3b8;">مسح</button>
+                </div>
+            `;
+            const pool = document.getElementById('order-pool');
+            qData.words.forEach(word => {
+                const chip = document.createElement('button');
+                chip.className = 'option-btn';
+                chip.style.padding = '8px 16px';
+                chip.style.fontSize = '0.95rem';
+                chip.innerText = word;
+                chip.onclick = () => selectOrderWord(word, chip);
+                pool.appendChild(chip);
+            });
+
+            document.getElementById('order-submit').addEventListener('click', submitOrdering);
+            document.getElementById('order-clear').addEventListener('click', clearOrdering);
+        }
+
+        function selectOrderWord(word, chipEl) {
+            chipEl.style.display = 'none';
+            currentOrderSelection.push({ word, chipEl });
+
+            const slot = document.getElementById('order-slot');
+            const tag = document.createElement('span');
+            tag.innerText = word;
+            tag.style.cssText = 'background:var(--teal-accent);color:#fff;padding:6px 14px;border-radius:6px;font-weight:600;';
+            slot.appendChild(tag);
+
+            const qData = levelsData[currentLevel][currentQuestionIndex];
+            document.getElementById('order-submit').disabled = currentOrderSelection.length !== qData.words.length;
+        }
+
+        function clearOrdering() {
+            currentOrderSelection.forEach(item => item.chipEl.style.display = 'inline-block');
+            currentOrderSelection = [];
+            document.getElementById('order-slot').innerHTML = '';
+            document.getElementById('order-submit').disabled = true;
+        }
+
+        function submitOrdering() {
+            const qData = levelsData[currentLevel][currentQuestionIndex];
+            const userSentence = currentOrderSelection.map(i => i.word).join(' ');
+            const isCorrect = userSentence.trim().toLowerCase() === qData.answer.trim().toLowerCase();
+
+            document.querySelectorAll('#order-pool .option-btn').forEach(b => b.onclick = null);
+            document.getElementById('order-submit').disabled = true;
+            document.getElementById('order-clear').disabled = true;
+            document.getElementById('order-slot').style.borderColor = isCorrect ? 'var(--success)' : 'var(--error)';
+
+            if (!isCorrect) {
+                const hint = document.createElement('p');
+                hint.style.cssText = 'color:var(--error);margin-top:10px;font-weight:600;';
+                hint.innerText = 'الترتيب الصحيح: ' + qData.answer;
+                document.getElementById('answer-area').appendChild(hint);
+            }
+
+            if (isCorrect) { score++; playSound('correct'); } else { playSound('incorrect'); }
+
+            currentAnswersLog.push({
+                question: qData.q,
+                selected: userSentence,
+                correct: qData.answer,
+                isCorrect: isCorrect
+            });
+
+            advanceQuestion();
+        }
+
+        function advanceQuestion() {
             setTimeout(() => {
                 currentQuestionIndex++;
-                if (currentQuestionIndex < 10) {
+                if (currentQuestionIndex < levelsData[currentLevel].length) {
                     loadQuestion();
                 } else {
                     finishLevel();
@@ -512,25 +739,31 @@
         }
 
         function finishLevel() {
+            const total = levelsData[currentLevel].length;
             levelScores[currentLevel] = score;
-            const percentage = (score / 10) * 100;
+            const percentage = Math.round((score / total) * 100);
 
             let resultTitle = document.getElementById('result-title');
             let resultMessage = document.getElementById('result-message');
+            let continueBtn = document.getElementById('continue-btn');
 
             resultTitle.innerText = `انتهى المستوى ${currentLevel + 1}!`;
-            resultMessage.innerText = `لقد حصلت على ${score} من 10 (${percentage}%)`;
+            resultMessage.innerText = `لقد حصلت على ${score} من ${total} (${percentage}%)`;
 
-            if (percentage >= 80) {
-                resultMessage.innerText += `\nممتاز! أداء رائع 🎉`;
-            } else if (currentLevel === 2) {
-                resultMessage.innerText += `\nأحسنت على إكمال المستويات الثلاثة 🏆`;
+            const nextLevel = currentLevel + 1;
+
+            if (nextLevel < levelsData.length) {
+                resultMessage.innerText += `\nجاري الانتقال إلى المستوى التالي تلقائيًا...`;
+                continueBtn.style.display = 'none';
+                switchScreen('results-screen');
+                setTimeout(() => { startLevel(nextLevel); }, 2500);
             } else {
-                resultMessage.innerText += `\nيمكنك المتابعة للمستوى التالي أو إعادة المحاولة لتحسين نتيجتك.`;
+                resultMessage.innerText += `\nتهانينا! لقد أتممت جميع المستويات 🏆`;
+                continueBtn.style.display = 'inline-block';
+                continueBtn.innerText = 'العودة للقائمة الرئيسية';
+                continueBtn.onclick = returnToHome;
+                switchScreen('results-screen');
             }
-
-            updateLevelsUI();
-            switchScreen('results-screen');
 
             sendResultsToSheet({
                 studentName: studentData.name,
@@ -541,23 +774,6 @@
                 percentage: percentage,
                 answers: currentAnswersLog
             });
-        }
-
-        function updateLevelsUI() {
-            for (let i = 0; i < 3; i++) {
-                const card = document.getElementById(`card-${i}`);
-                const status = document.getElementById(`status-${i}`);
-                if (i === 0) continue;
-
-                if (unlockedLevels[i]) {
-                    if(card) card.classList.remove('locked');
-                    if(status) {
-                        status.innerText = 'متاح';
-                        status.style.background = 'rgba(13, 148, 136, 0.2)';
-                        status.style.color = '#5eead4';
-                    }
-                }
-            }
         }
 
         function returnToHome() {
