@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
@@ -418,4 +417,639 @@
                 { type: "mcq", q: "Choose the correct collocation: The company managed to _____ a high profit this year.", options: ["do", "make", "get", "take"], answer: 1 },
                 { type: "mcq", q: "Choose the correct sentence:", options: ["Despite the rain, we went out.", "Despite of the rain, we went out.", "Despite it rained, we went out.", "Despite the rain was heavy, we went out."], answer: 0 },
                 { type: "mcq", q: "Choose the correct word to complete the definition: A _____ is a person who is exceptionally intelligent or creative.", options: ["novice", "prodigy", "slacker", "miser"], answer: 1 },
-                { type: "mcq", q: "Choose the correct form: I'd rather you _____ smoke here.", options: ["don't", "didn't", "won't", "not"], an
+                { type: "mcq", q: "Choose the correct form: I'd rather you _____ smoke here.", options: ["don't", "didn't", "won't", "not"], answer: 1 },
+                { type: "mcq", q: "Choose the correct collocation: After a long discussion, they finally _____ a conclusion.", options: ["made", "did", "came to", "took"], answer: 2 },
+                { type: "mcq", q: "Choose the correct linking word: The traffic was terrible; _____, we arrived on time.", options: ["therefore", "moreover", "nevertheless", "furthermore"], answer: 2 },
+                { type: "mcq", q: "Choose the correct passive form: The report _____ by tomorrow.", options: ["must finish", "must be finished", "must finishing", "must be finish"], answer: 1 },
+
+                { type: "typing", label: "أكمل الجملة:", q: "I regret not ___ (study) harder at school.", answer: "studying" },
+                { type: "typing", label: "أكمل الجملة:", q: "The bridge ___ (build) by next year.", answer: "will be built" },
+                { type: "typing", label: "أكمل الجملة:", q: "If she ___ (study) harder, she would have passed the exam.", answer: "had studied" },
+                { type: "typing", label: "أكمل الجملة:", q: "The company's profits have ___ (increase) significantly this year.", answer: "increased" },
+                { type: "typing", label: "أكمل الجملة:", q: "She apologized for ___ (be) late.", answer: "being" },
+
+                { type: "typing", label: "ترجم الجملة إلى الإنجليزية:", q: "لو كنت أعرف، لكنت ساعدتك.", answer: "If I had known, I would have helped you" },
+                { type: "typing", label: "ترجم الجملة إلى الإنجليزية:", q: "على الرغم من المطر، خرجنا في نزهة.", answer: "Despite the rain, we went out for a walk" },
+                { type: "typing", label: "ترجم الجملة إلى الإنجليزية:", q: "الاجتماع أُجّل إلى الأسبوع القادم.", answer: "The meeting was postponed until next week" },
+                { type: "typing", label: "ترجم الجملة إلى الإنجليزية:", q: "يجب تسليم التقرير بحلول يوم الجمعة.", answer: "The report must be submitted by Friday" },
+                { type: "typing", label: "ترجم الجملة إلى الإنجليزية:", q: "كان الامتحان صعبًا لدرجة أن كثيرًا من الطلاب رسبوا.", answer: "The exam was so difficult that many students failed" },
+
+                { type: "typing", label: "صحح الفعل الذي تحته خط:", q: "He <u>has finished</u> the report yesterday.", answer: "finished" },
+                { type: "typing", label: "صحح الفعل الذي تحته خط:", q: "The company <u>make</u> a huge profit last year.", answer: "made" },
+                { type: "typing", label: "صحح الفعل الذي تحته خط:", q: "If I <u>would know</u> the answer, I would tell you.", answer: "knew" },
+                { type: "typing", label: "صحح الفعل الذي تحته خط:", q: "The letter <u>send</u> by the manager this morning.", answer: "was sent" },
+                { type: "typing", label: "صحح الفعل الذي تحته خط:", q: "By the time she called, I <u>leave</u> already.", answer: "had left" }
+            ]
+        ];
+
+        let currentLevel = 0;
+        let currentQuestionIndex = 0;
+        let score = 0;
+        let levelScores = [0, 0, 0];
+        let unlockedLevels = [true, true, true];
+        let studentData = { name: '', age: '', info: '' };
+        let currentAnswersLog = [];
+        let fullResults = [];
+        let quizInProgress = false;
+        const levelNames = ["المستوى الأول (A1-A2)", "المستوى الثاني (B1)", "المستوى الثالث (B2)"];
+
+        window.addEventListener('beforeunload', function (e) {
+            if (quizInProgress) {
+                e.preventDefault();
+                e.returnValue = '';
+                return '';
+            }
+        });
+
+        // رابط نشر Google Apps Script
+        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxhqRxoalVUn8sGiBUQb_gYA25oPFI57kQ8CWVS71Eru7ejkZfIhLoNWsyPlONF0KFj/exec";
+
+        function submitRegistration() {
+            const name = document.getElementById('student-name').value.trim();
+            const age = document.getElementById('student-age').value.trim();
+            const info = document.getElementById('student-info').value.trim();
+            const phone = document.getElementById('student-phone').value.trim();
+            const errorEl = document.getElementById('reg-error');
+
+            if (!name || !age) {
+                errorEl.style.display = 'block';
+                return;
+            }
+            errorEl.style.display = 'none';
+            studentData = { name, age, info, phone };
+            switchScreen('home-screen');
+        }
+
+        function sendResultsToSheet(payload) {
+            if (SCRIPT_URL.indexOf('PASTE_') !== -1) {
+                console.warn('لم يتم ربط رابط Google Apps Script بعد.');
+                return;
+            }
+            fetch(SCRIPT_URL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                body: JSON.stringify(payload)
+            }).catch(err => console.error('تعذر إرسال النتائج:', err));
+        }
+
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+        function playSound(type) {
+            if (audioCtx.state === 'suspended') {
+                audioCtx.resume();
+            }
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+
+            if (type === 'correct') {
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(440, audioCtx.currentTime);
+                osc.frequency.exponentialRampToValueAtTime(880, audioCtx.currentTime + 0.15);
+                gain.gain.setValueAtTime(0.2, audioCtx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.3);
+                osc.start();
+                osc.stop(audioCtx.currentTime + 0.3);
+            } else if (type === 'incorrect') {
+                osc.type = 'sawtooth';
+                osc.frequency.setValueAtTime(220, audioCtx.currentTime);
+                osc.frequency.setValueAtTime(150, audioCtx.currentTime + 0.1);
+                gain.gain.setValueAtTime(0.2, audioCtx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.25);
+                osc.start();
+                osc.stop(audioCtx.currentTime + 0.25);
+            }
+        }
+
+        function switchScreen(screenId) {
+            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+            document.getElementById(screenId).classList.add('active');
+        }
+
+        function startLevel(levelIndex) {
+            if (!unlockedLevels[levelIndex]) return;
+            quizInProgress = true;
+            currentLevel = levelIndex;
+            currentQuestionIndex = 0;
+            score = 0;
+            currentAnswersLog = [];
+            switchScreen('quiz-screen');
+            loadQuestion();
+        }
+
+        let currentOrderSelection = [];
+
+        function loadQuestion() {
+            const qData = levelsData[currentLevel][currentQuestionIndex];
+            const total = levelsData[currentLevel].length;
+            document.getElementById('question-progress').innerText = `السؤال ${currentQuestionIndex + 1} من ${total}`;
+            document.getElementById('score-display').innerText = `النقاط: ${score}`;
+            document.getElementById('question-text').innerHTML = qData.q;
+
+            const audioContainer = document.getElementById('audio-container');
+            audioContainer.innerHTML = qData.audio
+                ? `<audio controls src="${qData.audio}" style="width:100%;margin-bottom:20px;">متصفحك لا يدعم تشغيل الصوت</audio>`
+                : '';
+
+            const labelContainer = document.getElementById('label-container');
+            labelContainer.innerHTML = qData.label
+                ? `<span style="display:inline-block;background:var(--teal-accent);color:#fff;padding:4px 12px;border-radius:20px;font-size:0.8rem;font-weight:600;margin-bottom:12px;">${qData.label}</span>`
+                : '';
+
+            const type = qData.type || 'mcq';
+            if (type === 'mcq' || type === 'listening') {
+                renderMcqUI(qData);
+            } else if (type === 'typing') {
+                renderTypingUI(qData);
+            } else if (type === 'ordering') {
+                renderOrderingUI(qData);
+            }
+        }
+
+        function shuffleArray(arr) {
+            const a = arr.slice();
+            for (let i = a.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [a[i], a[j]] = [a[j], a[i]];
+            }
+            return a;
+        }
+
+        function renderMcqUI(qData) {
+            const area = document.getElementById('answer-area');
+            area.innerHTML = '<div class="options-grid" id="options-container"></div>';
+            const optionsContainer = document.getElementById('options-container');
+
+            const shuffledIndices = shuffleArray(qData.options.map((_, i) => i));
+
+            shuffledIndices.forEach(origIndex => {
+                const btn = document.createElement('button');
+                btn.className = 'option-btn';
+                btn.innerText = qData.options[origIndex];
+                btn.dataset.origIndex = origIndex;
+                btn.onclick = () => selectAnswer(origIndex, btn);
+                optionsContainer.appendChild(btn);
+            });
+        }
+
+        function selectAnswer(selectedIndex, selectedBtn) {
+            const qData = levelsData[currentLevel][currentQuestionIndex];
+            const allBtns = document.querySelectorAll('.option-btn');
+
+            allBtns.forEach(btn => btn.disabled = true);
+
+            currentAnswersLog.push({
+                question: qData.q,
+                selected: qData.options[selectedIndex],
+                correct: qData.options[qData.answer],
+                isCorrect: selectedIndex === qData.answer,
+                category: 'القواعد (اختيار من متعدد)'
+            });
+
+            if (selectedIndex === qData.answer) {
+                selectedBtn.classList.add('correct');
+                score++;
+                playSound('correct');
+            } else {
+                selectedBtn.classList.add('incorrect');
+                const correctBtn = document.querySelector(`.option-btn[data-orig-index="${qData.answer}"]`);
+                if (correctBtn) correctBtn.classList.add('correct');
+                playSound('incorrect');
+            }
+
+            advanceQuestion();
+        }
+
+        function renderTypingUI(qData) {
+            const area = document.getElementById('answer-area');
+            area.innerHTML = `
+                <div class="form-group">
+                    <input type="text" id="typing-input" placeholder="اكتب إجابتك هنا">
+                </div>
+                <button class="btn" id="typing-submit" style="width:100%;">تأكيد الإجابة</button>
+            `;
+            const input = document.getElementById('typing-input');
+            document.getElementById('typing-submit').addEventListener('click', () => submitTyping(qData));
+            input.addEventListener('keypress', e => {
+                if (e.key === 'Enter') submitTyping(qData);
+            });
+            input.focus();
+        }
+
+        function normalizeAnswer(str) {
+            return str.trim().toLowerCase().replace(/[.,!?;:'"]/g, '').replace(/\s+/g, ' ');
+        }
+
+        function submitTyping(qData) {
+            const input = document.getElementById('typing-input');
+            const submitBtn = document.getElementById('typing-submit');
+            if (input.disabled) return;
+
+            const acceptedAnswers = Array.isArray(qData.answer) ? qData.answer : [qData.answer];
+            const userValue = input.value.trim();
+            const isCorrect = acceptedAnswers.some(a => normalizeAnswer(a) === normalizeAnswer(userValue));
+            const displayAnswer = acceptedAnswers[0];
+
+            input.disabled = true;
+            submitBtn.disabled = true;
+            input.style.borderColor = isCorrect ? 'var(--success)' : 'var(--error)';
+
+            if (!isCorrect) {
+                const hint = document.createElement('p');
+                hint.style.cssText = 'color:var(--error);margin-top:10px;font-weight:600;';
+                hint.innerText = 'الإجابة الصحيحة: ' + displayAnswer;
+                document.getElementById('answer-area').appendChild(hint);
+            }
+
+            if (isCorrect) { score++; playSound('correct'); } else { playSound('incorrect'); }
+
+            let category = 'أخرى';
+            const label = qData.label || '';
+            if (label.indexOf('أكمل الجملة') !== -1) category = 'إكمال الأزمنة';
+            else if (label.indexOf('ترجم') !== -1) category = 'الترجمة';
+            else if (label.indexOf('صحح') !== -1) category = 'تصحيح الأخطاء';
+
+            currentAnswersLog.push({
+                question: levelsData[currentLevel][currentQuestionIndex].q,
+                selected: userValue || '(فارغ)',
+                correct: displayAnswer,
+                isCorrect: isCorrect,
+                category: category
+            });
+
+            advanceQuestion();
+        }
+
+        function renderOrderingUI(qData) {
+            currentOrderSelection = [];
+            const area = document.getElementById('answer-area');
+            area.innerHTML = `
+                <div id="order-slot" style="min-height:50px;border:2px dashed #cbd5e1;border-radius:10px;padding:12px;margin-bottom:15px;display:flex;flex-wrap:wrap;gap:8px;"></div>
+                <div id="order-pool" style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:15px;"></div>
+                <div style="display:flex; gap:10px;">
+                    <button class="btn" id="order-submit" disabled>تأكيد الترتيب</button>
+                    <button class="btn" id="order-clear" style="background:#94a3b8;">مسح</button>
+                </div>
+            `;
+            const pool = document.getElementById('order-pool');
+            qData.words.forEach(word => {
+                const chip = document.createElement('button');
+                chip.className = 'option-btn';
+                chip.style.padding = '8px 16px';
+                chip.style.fontSize = '0.95rem';
+                chip.innerText = word;
+                chip.onclick = () => selectOrderWord(word, chip);
+                pool.appendChild(chip);
+            });
+
+            document.getElementById('order-submit').addEventListener('click', submitOrdering);
+            document.getElementById('order-clear').addEventListener('click', clearOrdering);
+        }
+
+        function selectOrderWord(word, chipEl) {
+            chipEl.style.display = 'none';
+            currentOrderSelection.push({ word, chipEl });
+
+            const slot = document.getElementById('order-slot');
+            const tag = document.createElement('span');
+            tag.innerText = word;
+            tag.style.cssText = 'background:var(--teal-accent);color:#fff;padding:6px 14px;border-radius:6px;font-weight:600;';
+            slot.appendChild(tag);
+
+            const qData = levelsData[currentLevel][currentQuestionIndex];
+            document.getElementById('order-submit').disabled = currentOrderSelection.length !== qData.words.length;
+        }
+
+        function clearOrdering() {
+            currentOrderSelection.forEach(item => item.chipEl.style.display = 'inline-block');
+            currentOrderSelection = [];
+            document.getElementById('order-slot').innerHTML = '';
+            document.getElementById('order-submit').disabled = true;
+        }
+
+        function submitOrdering() {
+            const qData = levelsData[currentLevel][currentQuestionIndex];
+            const userSentence = currentOrderSelection.map(i => i.word).join(' ');
+            const isCorrect = userSentence.trim().toLowerCase() === qData.answer.trim().toLowerCase();
+
+            document.querySelectorAll('#order-pool .option-btn').forEach(b => b.onclick = null);
+            document.getElementById('order-submit').disabled = true;
+            document.getElementById('order-clear').disabled = true;
+            document.getElementById('order-slot').style.borderColor = isCorrect ? 'var(--success)' : 'var(--error)';
+
+            if (!isCorrect) {
+                const hint = document.createElement('p');
+                hint.style.cssText = 'color:var(--error);margin-top:10px;font-weight:600;';
+                hint.innerText = 'الترتيب الصحيح: ' + qData.answer;
+                document.getElementById('answer-area').appendChild(hint);
+            }
+
+            if (isCorrect) { score++; playSound('correct'); } else { playSound('incorrect'); }
+
+            currentAnswersLog.push({
+                question: qData.q,
+                selected: userSentence,
+                correct: qData.answer,
+                isCorrect: isCorrect
+            });
+
+            advanceQuestion();
+        }
+
+        function advanceQuestion() {
+            setTimeout(() => {
+                currentQuestionIndex++;
+                if (currentQuestionIndex < levelsData[currentLevel].length) {
+                    loadQuestion();
+                } else {
+                    finishLevel();
+                }
+            }, 1200);
+        }
+
+        function finishLevel() {
+            const total = levelsData[currentLevel].length;
+            levelScores[currentLevel] = score;
+            const percentage = Math.round((score / total) * 100);
+
+            fullResults.push({
+                levelName: levelNames[currentLevel],
+                score: score,
+                total: total,
+                percentage: percentage,
+                answers: currentAnswersLog
+            });
+
+            let resultTitle = document.getElementById('result-title');
+            let resultMessage = document.getElementById('result-message');
+            let continueBtn = document.getElementById('continue-btn');
+            let finishBtn = document.getElementById('finish-btn');
+
+            resultTitle.innerText = `انتهى المستوى ${currentLevel + 1}!`;
+            resultMessage.innerText = `لقد حصلت على ${score} من ${total} (${percentage}%)`;
+
+            const nextLevel = currentLevel + 1;
+
+            if (nextLevel < levelsData.length) {
+                resultMessage.innerText += `\nهل تريد المتابعة إلى المستوى التالي أم إنهاء الاختبار الآن؟`;
+                continueBtn.style.display = 'inline-block';
+                continueBtn.innerText = 'متابعة للمستوى التالي';
+                finishBtn.style.display = 'inline-block';
+                finishBtn.innerText = 'إنهاء الاختبار الآن';
+            } else {
+                resultMessage.innerText += `\nلقد أتممت جميع المستويات 🏆`;
+                continueBtn.style.display = 'none';
+                finishBtn.style.display = 'inline-block';
+                finishBtn.innerText = 'إنهاء وإرسال النتيجة';
+            }
+
+            switchScreen('results-screen');
+        }
+
+        function continueToNextLevel() {
+            startLevel(currentLevel + 1);
+        }
+
+        function finishQuizNow() {
+            quizInProgress = false;
+
+            let totalScore = 0;
+            let totalQuestions = 0;
+            let combinedAnswers = [];
+
+            fullResults.forEach(levelResult => {
+                totalScore += levelResult.score;
+                totalQuestions += levelResult.total;
+                levelResult.answers.forEach(a => {
+                    combinedAnswers.push({
+                        question: `[${levelResult.levelName}] ${a.question}`,
+                        selected: a.selected,
+                        correct: a.correct,
+                        isCorrect: a.isCorrect
+                    });
+                });
+            });
+
+            const overallPercentage = totalQuestions > 0 ? Math.round((totalScore / totalQuestions) * 100) : 0;
+            const completedLevelNames = fullResults.map(r => r.levelName).join(' + ');
+
+            sendResultsToSheet({
+                studentName: studentData.name,
+                studentAge: studentData.age,
+                studentInfo: studentData.info,
+                levelName: completedLevelNames,
+                score: totalScore,
+                percentage: overallPercentage,
+                answers: combinedAnswers
+            });
+
+            document.getElementById('result-title').innerText = 'تم إنهاء الاختبار!';
+            document.getElementById('result-message').innerText =
+                `نتيجتك الكلية: ${totalScore} من ${totalQuestions} (${overallPercentage}%)\nشكرًا لإكمالك الاختبار، تم إرسال نتيجتك.`;
+            document.getElementById('continue-btn').style.display = 'none';
+            document.getElementById('finish-btn').style.display = 'none';
+
+            const skillBreakdown = buildSkillBreakdown(combinedAnswers);
+            const comments = buildAutoComments(skillBreakdown, overallPercentage);
+
+            window.lastQuizResult = {
+                studentName: studentData.name,
+                levelName: completedLevelNames,
+                score: totalScore,
+                total: totalQuestions,
+                percentage: overallPercentage,
+                skillBreakdown: skillBreakdown,
+                comments: comments
+            };
+
+            let downloadBtn = document.getElementById('download-card-btn');
+            if (!downloadBtn) {
+                downloadBtn = document.createElement('button');
+                downloadBtn.id = 'download-card-btn';
+                downloadBtn.className = 'btn';
+                downloadBtn.style.marginTop = '14px';
+                downloadBtn.innerText = 'تحميل بطاقة التقرير';
+                downloadBtn.onclick = downloadReportCard;
+                document.querySelector('.results-content').appendChild(downloadBtn);
+            }
+            downloadBtn.style.display = 'inline-block';
+        }
+
+        function getRecommendedBook(percentage) {
+            if (percentage < 30) return 'English File: Beginner';
+            if (percentage < 50) return 'English File: Elementary';
+            if (percentage < 65) return 'English File: Pre-Intermediate';
+            if (percentage < 80) return 'English File: Intermediate';
+            if (percentage < 90) return 'English File: Upper-Intermediate';
+            return 'English File: Advanced';
+        }
+
+        function gradeLabel(pct) {
+            if (pct >= 85) return 'ممتاز';
+            if (pct >= 70) return 'جيد جدًا';
+            if (pct >= 50) return 'جيد';
+            return 'ضعيف';
+        }
+
+        function buildSkillBreakdown(combinedAnswers) {
+            const categories = {};
+            combinedAnswers.forEach(a => {
+                const cat = a.category || 'أخرى';
+                if (!categories[cat]) categories[cat] = { total: 0, correct: 0 };
+                categories[cat].total++;
+                if (a.isCorrect) categories[cat].correct++;
+            });
+            const order = ['القواعد (اختيار من متعدد)', 'إكمال الأزمنة', 'الترجمة', 'تصحيح الأخطاء'];
+            return order
+                .filter(cat => categories[cat])
+                .map(cat => ({
+                    name: cat,
+                    pct: Math.round((categories[cat].correct / categories[cat].total) * 100)
+                }));
+        }
+
+        function buildAutoComments(skillBreakdown, overallPercentage) {
+            const strong = skillBreakdown.filter(s => s.pct >= 60).map(s => s.name);
+            const weak = skillBreakdown.filter(s => s.pct < 60).map(s => s.name);
+            const lines = [];
+            lines.push(strong.length
+                ? `نقاط القوة: ${strong.join('، ')}.`
+                : 'نقاط القوة: لم تظهر نقاط قوة واضحة في هذا الاختبار.');
+            lines.push(weak.length
+                ? `نقاط تحتاج عمل: ${weak.join('، ')}.`
+                : 'نقاط تحتاج عمل: لا توجد ملاحظات كبيرة.');
+            lines.push(overallPercentage < 50
+                ? 'التوصية: البدء بمستوى تأسيسي مع تدريب يومي قصير على الكتابة.'
+                : 'التوصية: مواصلة التدريب المنتظم لتثبيت المستوى الحالي.');
+            return lines;
+        }
+
+        function generateReportCard(data) {
+            document.getElementById('rc-name').innerText = data.studentName;
+            document.getElementById('rc-level').innerText = data.levelName;
+            document.getElementById('rc-date').innerText = new Date().toLocaleDateString('ar-EG', { year: 'numeric', month: 'long', day: 'numeric' });
+            document.getElementById('rc-overall-val').innerText = `${data.percentage}% — ${data.score}/${data.total}`;
+            document.getElementById('rc-book').innerText = getRecommendedBook(data.percentage);
+
+            const gradesList = document.getElementById('rc-grades-list');
+            gradesList.innerHTML = '';
+            data.skillBreakdown.forEach(s => {
+                const row = document.createElement('div');
+                row.className = 'rc-grade-row';
+                row.innerHTML = `<span class="rc-pct">${s.pct}%</span><span class="rc-skill">${s.name}</span>`;
+                gradesList.appendChild(row);
+            });
+
+            const commentsBox = document.getElementById('rc-comments');
+            commentsBox.innerHTML = '';
+            data.comments.forEach(line => {
+                const p = document.createElement('p');
+                p.innerText = line;
+                commentsBox.appendChild(p);
+            });
+
+            const cardEl = document.getElementById('rc-card');
+            return html2canvas(cardEl, { scale: 2, backgroundColor: '#ffffff' }).then(canvas => {
+                const link = document.createElement('a');
+                link.download = `تقرير-${data.studentName}.png`;
+                link.href = canvas.toDataURL('image/png');
+                link.click();
+            });
+        }
+
+        function downloadReportCard() {
+            const btn = document.getElementById('download-card-btn');
+            if (btn) { btn.disabled = true; btn.innerText = 'جاري إنشاء البطاقة...'; }
+            generateReportCard(window.lastQuizResult).finally(() => {
+                if (btn) { btn.disabled = false; btn.innerText = 'تحميل بطاقة التقرير'; }
+            });
+        }
+
+        function returnToHome() {
+            switchScreen('home-screen');
+        }
+    </script>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+
+    <style>
+        #report-card-container{position:fixed;top:-99999px;left:-99999px;z-index:-1;}
+        .rc-card{width:560px;background:#ffffff;font-family:'IBM Plex Sans Arabic',sans-serif;direction:rtl;}
+        .rc-header{background:#1e3a5f;color:#fff;padding:26px 32px;display:flex;align-items:center;gap:16px;}
+        .rc-badge{width:52px;height:52px;border-radius:50%;background:rgba(255,255,255,.15);display:flex;align-items:center;justify-content:center;font-weight:800;font-size:1.1rem;flex:none;border:2px solid rgba(255,255,255,.4);}
+        .rc-header h1{font-size:1.2rem;font-weight:700;}
+        .rc-header p{font-size:.8rem;color:#d6e4f0;margin-top:2px;}
+        .rc-title{text-align:center;padding:26px 20px 6px;}
+        .rc-title h2{color:#14293f;font-size:1.3rem;font-weight:800;}
+        .rc-info{margin:20px 28px;background:#dbe6f0;padding:18px 20px;display:flex;flex-direction:column;gap:12px;}
+        .rc-info-row{display:flex;justify-content:space-between;gap:14px;font-size:.9rem;}
+        .rc-info-row .rc-k{color:#14293f;font-weight:600;white-space:nowrap;}
+        .rc-info-row .rc-v{background:#fff;flex:1;padding:6px 12px;text-align:center;color:#1c2733;}
+        .rc-section-label{text-align:center;margin:24px 0 12px;}
+        .rc-section-label span{font-weight:700;color:#14293f;font-size:1.05rem;border-bottom:2px solid #b8d0e3;padding-bottom:4px;}
+        .rc-grades-wrap{margin:0 28px;background:#dbe6f0;padding:18px 20px;display:flex;gap:16px;}
+        .rc-grades-list{flex:1.4;display:flex;flex-direction:column;gap:10px;}
+        .rc-grade-row{display:flex;justify-content:space-between;align-items:center;gap:10px;}
+        .rc-grade-row .rc-skill{font-size:.87rem;color:#1c2733;}
+        .rc-grade-row .rc-pct{background:#fff;min-width:56px;text-align:center;padding:5px 8px;font-weight:700;color:#14293f;font-size:.85rem;}
+        .rc-grading-system{flex:1;background:#b8d0e3;padding:14px;text-align:center;}
+        .rc-grading-system h3{font-size:.82rem;color:#14293f;margin-bottom:10px;font-weight:700;}
+        .rc-gs-row{display:flex;justify-content:space-between;font-size:.78rem;color:#1c2733;padding:3px 4px;}
+        .rc-overall{margin:20px 28px;background:#14293f;color:#fff;padding:16px 20px;display:flex;justify-content:space-between;align-items:center;}
+        .rc-overall .rc-lbl{font-size:.85rem;color:#d6e4f0;}
+        .rc-overall .rc-val{font-size:1.4rem;font-weight:800;}
+        .rc-book-line{margin:18px 28px 0;background:#dbe6f0;padding:12px 18px;display:flex;justify-content:space-between;align-items:center;font-size:.86rem;}
+        .rc-book-line .rc-k{color:#14293f;font-weight:600;}
+        .rc-book-line .rc-v{font-weight:700;color:#1c2733;}
+        .rc-comments{margin:20px 28px 8px;}
+        .rc-comments-box{border:2px solid #b8d0e3;padding:16px 18px;}
+        .rc-comments-box p{font-size:.85rem;line-height:1.9;color:#1c2733;border-bottom:1px solid #dde8ef;padding-bottom:4px;margin-bottom:6px;}
+        .rc-comments-box p:last-child{border-bottom:none;margin-bottom:0;}
+        .rc-footer{margin-top:24px;background:#1e3a5f;color:#d6e4f0;text-align:center;padding:14px;font-size:.75rem;}
+    </style>
+
+    <div id="report-card-container">
+        <div class="rc-card" id="rc-card">
+            <div class="rc-header">
+                <div class="rc-badge">EN</div>
+                <div>
+                    <h1>مركز Ms. Amal Alhasan لتعليم اللغة الإنجليزية</h1>
+                    <p>اختبار تحديد المستوى</p>
+                </div>
+            </div>
+            <div class="rc-title"><h2>بطاقة تقرير الطالب</h2></div>
+            <div class="rc-info">
+                <div class="rc-info-row"><span class="rc-k">اسم الطالب</span><span class="rc-v" id="rc-name"></span></div>
+                <div class="rc-info-row"><span class="rc-k">المعلمة</span><span class="rc-v">Ms. Amal Alhasan</span></div>
+                <div class="rc-info-row"><span class="rc-k">المستوى المُختبَر</span><span class="rc-v" id="rc-level"></span></div>
+                <div class="rc-info-row"><span class="rc-k">التاريخ</span><span class="rc-v" id="rc-date"></span></div>
+            </div>
+            <div class="rc-section-label"><span>الدرجات حسب المهارة</span></div>
+            <div class="rc-grades-wrap">
+                <div class="rc-grades-list" id="rc-grades-list"></div>
+                <div class="rc-grading-system">
+                    <h3>نظام التقييم</h3>
+                    <div class="rc-gs-row"><span>ممتاز</span><span>85-100%</span></div>
+                    <div class="rc-gs-row"><span>جيد جدًا</span><span>70-84%</span></div>
+                    <div class="rc-gs-row"><span>جيد</span><span>50-69%</span></div>
+                    <div class="rc-gs-row"><span>ضعيف</span><span>0-49%</span></div>
+                </div>
+            </div>
+            <div class="rc-overall">
+                <span class="rc-lbl">النتيجة الكلية</span>
+                <span class="rc-val" id="rc-overall-val"></span>
+            </div>
+            <div class="rc-book-line">
+                <span class="rc-k">الكتاب المقترح</span>
+                <span class="rc-v" id="rc-book"></span>
+            </div>
+            <div class="rc-section-label"><span>ملاحظات تلقائية</span></div>
+            <div class="rc-comments">
+                <div class="rc-comments-box" id="rc-comments"></div>
+            </div>
+            <div class="rc-footer">تم إنشاؤها تلقائيًا من نتائج اختبار تحديد المستوى</div>
+        </div>
+    </div>
+</body>
+</html>
