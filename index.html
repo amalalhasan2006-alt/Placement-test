@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
@@ -319,6 +320,9 @@
         </div>
 
         <div id="quiz-screen" class="screen">
+            <div style="background:#fef2f2;border:2px solid var(--error);color:#991b1b;padding:10px 14px;border-radius:8px;font-size:0.85rem;font-weight:600;text-align:center;margin-bottom:15px;">
+                ⚠️ تنبيه: لا تغلقي الصفحة أو تعيدي تحميلها أثناء الاختبار، وإلا ستبدئين المستوى من جديد
+            </div>
             <div class="quiz-header">
                 <span id="question-progress">السؤال 1 من 10</span>
                 <span id="score-display">النقاط: 0</span>
@@ -333,7 +337,10 @@
             <div class="results-content">
                 <h2 id="result-title">انتهى المستوى!</h2>
                 <p id="result-message">لقد حصلت على 8 من 10</p>
-                <button class="btn" id="continue-btn" onclick="returnToHome()">العودة للمستويات</button>
+                <div style="display:flex; gap:10px; justify-content:center; flex-wrap:wrap;">
+                    <button class="btn" id="continue-btn" onclick="continueToNextLevel()">متابعة للمستوى التالي</button>
+                    <button class="btn" id="finish-btn" style="background:#64748b;" onclick="finishQuizNow()">إنهاء الاختبار الآن</button>
+                </div>
             </div>
         </div>
     </div>
@@ -352,23 +359,23 @@
                 { type: "mcq", q: "Choose the correct article: I saw _____ elephant at the zoo.", options: ["a", "an", "the", "(no article)"], answer: 1 },
                 { type: "mcq", q: "Choose the correct verb: They _____ football every weekend.", options: ["plays", "play", "playing", "played"], answer: 1 },
 
-                { type: "typing", label: "أكملي الجملة:", q: "My father ___ (work) in a bank.", answer: "works" },
-                { type: "typing", label: "أكملي الجملة:", q: "We ___ (not / like) spicy food.", answer: ["don't like", "do not like"] },
-                { type: "typing", label: "أكملي الجملة:", q: "Look! The children ___ (play) in the garden.", answer: "are playing" },
-                { type: "typing", label: "أكملي الجملة:", q: "She ___ (have) two brothers and one sister.", answer: "has" },
-                { type: "typing", label: "أكملي الجملة:", q: "Yesterday, I ___ (visit) my grandmother.", answer: "visited" },
+                { type: "typing", label: "أكمل الجملة:", q: "My father ___ (work) in a bank.", answer: "works" },
+                { type: "typing", label: "أكمل الجملة:", q: "We ___ (not / like) spicy food.", answer: ["don't like", "do not like"] },
+                { type: "typing", label: "أكمل الجملة:", q: "Look! The children ___ (play) in the garden.", answer: "are playing" },
+                { type: "typing", label: "أكمل الجملة:", q: "She ___ (have) two brothers and one sister.", answer: "has" },
+                { type: "typing", label: "أكمل الجملة:", q: "Yesterday, I ___ (visit) my grandmother.", answer: "visited" },
 
-                { type: "typing", label: "ترجمي الجملة إلى الإنجليزية:", q: "أنا أحب القراءة.", answer: ["I like reading", "I love reading"] },
-                { type: "typing", label: "ترجمي الجملة إلى الإنجليزية:", q: "هذا كتابي.", answer: "This is my book" },
-                { type: "typing", label: "ترجمي الجملة إلى الإنجليزية:", q: "هي تذهب إلى المدرسة كل يوم.", answer: "She goes to school every day" },
-                { type: "typing", label: "ترجمي الجملة إلى الإنجليزية:", q: "نحن نعيش في مدينة كبيرة.", answer: "We live in a big city" },
-                { type: "typing", label: "ترجمي الجملة إلى الإنجليزية:", q: "هل تحب القهوة؟", answer: ["Do you like coffee", "Do you like coffee?"] },
+                { type: "typing", label: "ترجم الجملة إلى الإنجليزية:", q: "أنا أحب القراءة.", answer: ["I like reading", "I love reading"] },
+                { type: "typing", label: "ترجم الجملة إلى الإنجليزية:", q: "هذا كتابي.", answer: "This is my book" },
+                { type: "typing", label: "ترجم الجملة إلى الإنجليزية:", q: "هي تذهب إلى المدرسة كل يوم.", answer: "She goes to school every day" },
+                { type: "typing", label: "ترجم الجملة إلى الإنجليزية:", q: "نحن نعيش في مدينة كبيرة.", answer: "We live in a big city" },
+                { type: "typing", label: "ترجم الجملة إلى الإنجليزية:", q: "هل تحب القهوة؟", answer: ["Do you like coffee", "Do you like coffee?"] },
 
-                { type: "typing", label: "صححي الفعل الذي تحته خط:", q: "She <u>go</u> to school every morning.", answer: "goes" },
-                { type: "typing", label: "صححي الفعل الذي تحته خط:", q: "He <u>are</u> a doctor.", answer: "is" },
-                { type: "typing", label: "صححي الفعل الذي تحته خط:", q: "They <u>doesn't</u> like vegetables.", answer: "don't" },
-                { type: "typing", label: "صححي الفعل الذي تحته خط:", q: "I <u>is</u> from Syria.", answer: "am" },
-                { type: "typing", label: "صححي الفعل الذي تحته خط:", q: "We <u>goed</u> to the market yesterday.", answer: "went" }
+                { type: "typing", label: "صحح الفعل الذي تحته خط:", q: "She <u>go</u> to school every morning.", answer: "goes" },
+                { type: "typing", label: "صحح الفعل الذي تحته خط:", q: "He <u>are</u> a doctor.", answer: "is" },
+                { type: "typing", label: "صحح الفعل الذي تحته خط:", q: "They <u>doesn't</u> like vegetables.", answer: "don't" },
+                { type: "typing", label: "صحح الفعل الذي تحته خط:", q: "I <u>is</u> from Syria.", answer: "am" },
+                { type: "typing", label: "صحح الفعل الذي تحته خط:", q: "We <u>goed</u> to the market yesterday.", answer: "went" }
             ],
             [
                 { type: "mcq", q: "Choose the correct sentence: 'If I ___ him, I will tell him.'", options: ["will see", "see", "saw", "seeing"], answer: 1 },
@@ -382,23 +389,23 @@
                 { type: "mcq", q: "Choose the correct preposition: I have lived here _____ five years.", options: ["since", "for", "from", "at"], answer: 1 },
                 { type: "mcq", q: "Choose the correct sentence: When I was young, I _____ play football every day.", options: ["use to", "used to", "uses to", "using to"], answer: 1 },
 
-                { type: "typing", label: "أكملي الجملة:", q: "If it ___ (rain) tomorrow, we will stay home.", answer: "rains" },
-                { type: "typing", label: "أكملي الجملة:", q: "She has ___ (live) here since 2015.", answer: "lived" },
-                { type: "typing", label: "أكملي الجملة:", q: "By next year, I ___ (graduate) from university.", answer: "will graduate" },
-                { type: "typing", label: "أكملي الجملة:", q: "This report ___ (write) by the manager last week.", answer: "was written" },
-                { type: "typing", label: "أكملي الجملة:", q: "I ___ (not / finish) my project yet.", answer: ["haven't finished", "have not finished"] },
+                { type: "typing", label: "أكمل الجملة:", q: "If it ___ (rain) tomorrow, we will stay home.", answer: "rains" },
+                { type: "typing", label: "أكمل الجملة:", q: "She has ___ (live) here since 2015.", answer: "lived" },
+                { type: "typing", label: "أكمل الجملة:", q: "By next year, I ___ (graduate) from university.", answer: "will graduate" },
+                { type: "typing", label: "أكمل الجملة:", q: "This report ___ (write) by the manager last week.", answer: "was written" },
+                { type: "typing", label: "أكمل الجملة:", q: "I ___ (not / finish) my project yet.", answer: ["haven't finished", "have not finished"] },
 
-                { type: "typing", label: "ترجمي الجملة إلى الإنجليزية:", q: "لقد عشت في هذه المدينة منذ خمس سنوات.", answer: "I have lived in this city for five years" },
-                { type: "typing", label: "ترجمي الجملة إلى الإنجليزية:", q: "لو كان عندي وقت، كنت سأزورك.", answer: "If I had time, I would visit you" },
-                { type: "typing", label: "ترجمي الجملة إلى الإنجليزية:", q: "يجب أن تنهي واجبك قبل الساعة العاشرة.", answer: "You must finish your homework before ten o'clock" },
-                { type: "typing", label: "ترجمي الجملة إلى الإنجليزية:", q: "هذا المنزل بُني في عام 1990.", answer: "This house was built in 1990" },
-                { type: "typing", label: "ترجمي الجملة إلى الإنجليزية:", q: "أتمنى لو كانت لدي سيارة أكبر.", answer: "I wish I had a bigger car" },
+                { type: "typing", label: "ترجم الجملة إلى الإنجليزية:", q: "لقد عشت في هذه المدينة منذ خمس سنوات.", answer: "I have lived in this city for five years" },
+                { type: "typing", label: "ترجم الجملة إلى الإنجليزية:", q: "لو كان عندي وقت، كنت سأزورك.", answer: "If I had time, I would visit you" },
+                { type: "typing", label: "ترجم الجملة إلى الإنجليزية:", q: "يجب أن تنهي واجبك قبل الساعة العاشرة.", answer: "You must finish your homework before ten o'clock" },
+                { type: "typing", label: "ترجم الجملة إلى الإنجليزية:", q: "هذا المنزل بُني في عام 1990.", answer: "This house was built in 1990" },
+                { type: "typing", label: "ترجم الجملة إلى الإنجليزية:", q: "أتمنى لو كانت لدي سيارة أكبر.", answer: "I wish I had a bigger car" },
 
-                { type: "typing", label: "صححي الفعل الذي تحته خط:", q: "She <u>has went</u> to the market.", answer: ["has gone", "went"] },
-                { type: "typing", label: "صححي الفعل الذي تحته خط:", q: "If I <u>will see</u> him, I will tell him.", answer: "see" },
-                { type: "typing", label: "صححي الفعل الذي تحته خط:", q: "This house <u>build</u> in 1995.", answer: "was built" },
-                { type: "typing", label: "صححي الفعل الذي تحته خط:", q: "They <u>has</u> finished the project.", answer: "have" },
-                { type: "typing", label: "صححي الفعل الذي تحته خط:", q: "By the time we arrived, the train <u>leave</u>.", answer: "had left" }
+                { type: "typing", label: "صحح الفعل الذي تحته خط:", q: "She <u>has went</u> to the market.", answer: ["has gone", "went"] },
+                { type: "typing", label: "صحح الفعل الذي تحته خط:", q: "If I <u>will see</u> him, I will tell him.", answer: "see" },
+                { type: "typing", label: "صحح الفعل الذي تحته خط:", q: "This house <u>build</u> in 1995.", answer: "was built" },
+                { type: "typing", label: "صحح الفعل الذي تحته خط:", q: "They <u>has</u> finished the project.", answer: "have" },
+                { type: "typing", label: "صحح الفعل الذي تحته خط:", q: "By the time we arrived, the train <u>leave</u>.", answer: "had left" }
             ],
             [
                 { type: "mcq", q: "Choose the best advanced connector: _____ the weather was terrible, we enjoyed our trip.", options: ["Despite", "Although", "In spite of", "However"], answer: 1 },
@@ -412,23 +419,23 @@
                 { type: "mcq", q: "Choose the correct linking word: The traffic was terrible; _____, we arrived on time.", options: ["therefore", "moreover", "nevertheless", "furthermore"], answer: 2 },
                 { type: "mcq", q: "Choose the correct passive form: The report _____ by tomorrow.", options: ["must finish", "must be finished", "must finishing", "must be finish"], answer: 1 },
 
-                { type: "typing", label: "أكملي الجملة:", q: "I regret not ___ (study) harder at school.", answer: "studying" },
-                { type: "typing", label: "أكملي الجملة:", q: "The bridge ___ (build) by next year.", answer: "will be built" },
-                { type: "typing", label: "أكملي الجملة:", q: "If she ___ (study) harder, she would have passed the exam.", answer: "had studied" },
-                { type: "typing", label: "أكملي الجملة:", q: "The company's profits have ___ (increase) significantly this year.", answer: "increased" },
-                { type: "typing", label: "أكملي الجملة:", q: "She apologized for ___ (be) late.", answer: "being" },
+                { type: "typing", label: "أكمل الجملة:", q: "I regret not ___ (study) harder at school.", answer: "studying" },
+                { type: "typing", label: "أكمل الجملة:", q: "The bridge ___ (build) by next year.", answer: "will be built" },
+                { type: "typing", label: "أكمل الجملة:", q: "If she ___ (study) harder, she would have passed the exam.", answer: "had studied" },
+                { type: "typing", label: "أكمل الجملة:", q: "The company's profits have ___ (increase) significantly this year.", answer: "increased" },
+                { type: "typing", label: "أكمل الجملة:", q: "She apologized for ___ (be) late.", answer: "being" },
 
-                { type: "typing", label: "ترجمي الجملة إلى الإنجليزية:", q: "لو كنت أعرف، لكنت ساعدتك.", answer: "If I had known, I would have helped you" },
-                { type: "typing", label: "ترجمي الجملة إلى الإنجليزية:", q: "على الرغم من المطر، خرجنا في نزهة.", answer: "Despite the rain, we went out for a walk" },
-                { type: "typing", label: "ترجمي الجملة إلى الإنجليزية:", q: "الاجتماع أُجّل إلى الأسبوع القادم.", answer: "The meeting was postponed until next week" },
-                { type: "typing", label: "ترجمي الجملة إلى الإنجليزية:", q: "يجب تسليم التقرير بحلول يوم الجمعة.", answer: "The report must be submitted by Friday" },
-                { type: "typing", label: "ترجمي الجملة إلى الإنجليزية:", q: "كان الامتحان صعبًا لدرجة أن كثيرًا من الطلاب رسبوا.", answer: "The exam was so difficult that many students failed" },
+                { type: "typing", label: "ترجم الجملة إلى الإنجليزية:", q: "لو كنت أعرف، لكنت ساعدتك.", answer: "If I had known, I would have helped you" },
+                { type: "typing", label: "ترجم الجملة إلى الإنجليزية:", q: "على الرغم من المطر، خرجنا في نزهة.", answer: "Despite the rain, we went out for a walk" },
+                { type: "typing", label: "ترجم الجملة إلى الإنجليزية:", q: "الاجتماع أُجّل إلى الأسبوع القادم.", answer: "The meeting was postponed until next week" },
+                { type: "typing", label: "ترجم الجملة إلى الإنجليزية:", q: "يجب تسليم التقرير بحلول يوم الجمعة.", answer: "The report must be submitted by Friday" },
+                { type: "typing", label: "ترجم الجملة إلى الإنجليزية:", q: "كان الامتحان صعبًا لدرجة أن كثيرًا من الطلاب رسبوا.", answer: "The exam was so difficult that many students failed" },
 
-                { type: "typing", label: "صححي الفعل الذي تحته خط:", q: "He <u>has finished</u> the report yesterday.", answer: "finished" },
-                { type: "typing", label: "صححي الفعل الذي تحته خط:", q: "The company <u>make</u> a huge profit last year.", answer: "made" },
-                { type: "typing", label: "صححي الفعل الذي تحته خط:", q: "If I <u>would know</u> the answer, I would tell you.", answer: "knew" },
-                { type: "typing", label: "صححي الفعل الذي تحته خط:", q: "The letter <u>send</u> by the manager this morning.", answer: "was sent" },
-                { type: "typing", label: "صححي الفعل الذي تحته خط:", q: "By the time she called, I <u>leave</u> already.", answer: "had left" }
+                { type: "typing", label: "صحح الفعل الذي تحته خط:", q: "He <u>has finished</u> the report yesterday.", answer: "finished" },
+                { type: "typing", label: "صحح الفعل الذي تحته خط:", q: "The company <u>make</u> a huge profit last year.", answer: "made" },
+                { type: "typing", label: "صحح الفعل الذي تحته خط:", q: "If I <u>would know</u> the answer, I would tell you.", answer: "knew" },
+                { type: "typing", label: "صحح الفعل الذي تحته خط:", q: "The letter <u>send</u> by the manager this morning.", answer: "was sent" },
+                { type: "typing", label: "صحح الفعل الذي تحته خط:", q: "By the time she called, I <u>leave</u> already.", answer: "had left" }
             ]
         ];
 
@@ -439,7 +446,17 @@
         let unlockedLevels = [true, true, true];
         let studentData = { name: '', age: '', info: '' };
         let currentAnswersLog = [];
+        let fullResults = [];
+        let quizInProgress = false;
         const levelNames = ["المستوى الأول (A1-A2)", "المستوى الثاني (B1)", "المستوى الثالث (B2)"];
+
+        window.addEventListener('beforeunload', function (e) {
+            if (quizInProgress) {
+                e.preventDefault();
+                e.returnValue = '';
+                return '';
+            }
+        });
 
         // رابط نشر Google Apps Script
         const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxhqRxoalVUn8sGiBUQb_gYA25oPFI57kQ8CWVS71Eru7ejkZfIhLoNWsyPlONF0KFj/exec";
@@ -508,6 +525,7 @@
 
         function startLevel(levelIndex) {
             if (!unlockedLevels[levelIndex]) return;
+            quizInProgress = true;
             currentLevel = levelIndex;
             currentQuestionIndex = 0;
             score = 0;
@@ -602,7 +620,7 @@
             const area = document.getElementById('answer-area');
             area.innerHTML = `
                 <div class="form-group">
-                    <input type="text" id="typing-input" placeholder="اكتبي إجابتك هنا">
+                    <input type="text" id="typing-input" placeholder="اكتب إجابتك هنا">
                 </div>
                 <button class="btn" id="typing-submit" style="width:100%;">تأكيد الإجابة</button>
             `;
@@ -743,9 +761,18 @@
             levelScores[currentLevel] = score;
             const percentage = Math.round((score / total) * 100);
 
+            fullResults.push({
+                levelName: levelNames[currentLevel],
+                score: score,
+                total: total,
+                percentage: percentage,
+                answers: currentAnswersLog
+            });
+
             let resultTitle = document.getElementById('result-title');
             let resultMessage = document.getElementById('result-message');
             let continueBtn = document.getElementById('continue-btn');
+            let finishBtn = document.getElementById('finish-btn');
 
             resultTitle.innerText = `انتهى المستوى ${currentLevel + 1}!`;
             resultMessage.innerText = `لقد حصلت على ${score} من ${total} (${percentage}%)`;
@@ -753,27 +780,63 @@
             const nextLevel = currentLevel + 1;
 
             if (nextLevel < levelsData.length) {
-                resultMessage.innerText += `\nجاري الانتقال إلى المستوى التالي تلقائيًا...`;
-                continueBtn.style.display = 'none';
-                switchScreen('results-screen');
-                setTimeout(() => { startLevel(nextLevel); }, 2500);
-            } else {
-                resultMessage.innerText += `\nتهانينا! لقد أتممت جميع المستويات 🏆`;
+                resultMessage.innerText += `\nهل تريد المتابعة إلى المستوى التالي أم إنهاء الاختبار الآن؟`;
                 continueBtn.style.display = 'inline-block';
-                continueBtn.innerText = 'العودة للقائمة الرئيسية';
-                continueBtn.onclick = returnToHome;
-                switchScreen('results-screen');
+                continueBtn.innerText = 'متابعة للمستوى التالي';
+                finishBtn.style.display = 'inline-block';
+                finishBtn.innerText = 'إنهاء الاختبار الآن';
+            } else {
+                resultMessage.innerText += `\nلقد أتممت جميع المستويات 🏆`;
+                continueBtn.style.display = 'none';
+                finishBtn.style.display = 'inline-block';
+                finishBtn.innerText = 'إنهاء وإرسال النتيجة';
             }
+
+            switchScreen('results-screen');
+        }
+
+        function continueToNextLevel() {
+            startLevel(currentLevel + 1);
+        }
+
+        function finishQuizNow() {
+            quizInProgress = false;
+
+            let totalScore = 0;
+            let totalQuestions = 0;
+            let combinedAnswers = [];
+
+            fullResults.forEach(levelResult => {
+                totalScore += levelResult.score;
+                totalQuestions += levelResult.total;
+                levelResult.answers.forEach(a => {
+                    combinedAnswers.push({
+                        question: `[${levelResult.levelName}] ${a.question}`,
+                        selected: a.selected,
+                        correct: a.correct,
+                        isCorrect: a.isCorrect
+                    });
+                });
+            });
+
+            const overallPercentage = totalQuestions > 0 ? Math.round((totalScore / totalQuestions) * 100) : 0;
+            const completedLevelNames = fullResults.map(r => r.levelName).join(' + ');
 
             sendResultsToSheet({
                 studentName: studentData.name,
                 studentAge: studentData.age,
                 studentInfo: studentData.info,
-                levelName: levelNames[currentLevel],
-                score: score,
-                percentage: percentage,
-                answers: currentAnswersLog
+                levelName: completedLevelNames,
+                score: totalScore,
+                percentage: overallPercentage,
+                answers: combinedAnswers
             });
+
+            document.getElementById('result-title').innerText = 'تم إنهاء الاختبار!';
+            document.getElementById('result-message').innerText =
+                `نتيجتك الكلية: ${totalScore} من ${totalQuestions} (${overallPercentage}%)\nشكرًا لإكمالك الاختبار، تم إرسال نتيجتك.`;
+            document.getElementById('continue-btn').style.display = 'none';
+            document.getElementById('finish-btn').style.display = 'none';
         }
 
         function returnToHome() {
